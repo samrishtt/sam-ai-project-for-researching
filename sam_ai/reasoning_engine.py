@@ -33,10 +33,12 @@ v2 Changes
 """
 
 from __future__ import annotations
-
 import math
 import re
-from typing import Any, Dict, List, Optional, Tuple
+import statistics
+import time
+import difflib
+from typing import Dict, List, Optional, Tuple, Any, Union
 
 from sam_ai.utils.logging import SAMLogger
 
@@ -143,6 +145,11 @@ def _sem_tokens(text: str) -> set:
     """Extract semantically meaningful stemmed tokens (skip stop words)."""
     words = _normalise(text).split()
     return {_stem(w) for w in words if w not in _STOP_WORDS}
+
+
+def _string_similarity(a: str, b: str) -> float:
+    """Return Levenshtein-based similarity ratio between two strings."""
+    return difflib.SequenceMatcher(None, a, b).ratio()
 
 
 def _fuzzy_match(a: str, b: str, threshold: float = 0.5) -> bool:
@@ -265,9 +272,31 @@ class ReasoningEngine:
                 if canon is not None:
                     return facts.get(canon)
 
-            # Fuzzy fallback — scan all known facts
+            # Fuzzy fallback — scan all known facts (with token-level check)
+            q_norm = _normalise(key)
+            q_tokens = _sem_tokens(key)
+            
             for fk, fv in facts.items():
                 if _fuzzy_match(key, fk, 0.55):
+                    return fv
+                
+                # Token-level check (for 'sun shines' vs 'sun is shining')
+                fk_tokens = _sem_tokens(fk)
+                if not fk_tokens or not q_tokens:
+                    continue
+                    
+                overlap_count = 0
+                matched_fk = set()
+                for qt in q_tokens:
+                    for ft in fk_tokens:
+                        if ft not in matched_fk:
+                            if qt == ft or _string_similarity(qt, ft) >= 0.85:
+                                overlap_count += 1
+                                matched_fk.add(ft)
+                                break
+                
+                score = overlap_count / min(len(fk_tokens), len(q_tokens))
+                if score >= 0.8: # Strict threshold for inference
                     return fv
             return None
 
@@ -758,15 +787,28 @@ class ReasoningEngine:
             if fk in q or q in fk:
                 return val
 
-        # Pass 2: fuzzy semantic overlap (Jaccard ≥ 0.45)
+        # Pass 2: fuzzy semantic overlap (Jaccard with fuzzy token match)
         best_score = 0.0
         best_val = None
         for fact_key, val in facts.items():
             fk_tokens = _sem_tokens(fact_key)
             if not fk_tokens:
                 continue
-            overlap = fk_tokens & q_tokens
-            score = len(overlap) / min(len(fk_tokens), len(q_tokens)) if min(len(fk_tokens), len(q_tokens)) > 0 else 0
+            
+            # Count fuzzy matches between tokens (e.g. 'shin' ~= 'shine')
+            overlap_count = 0
+            # Simple greedy matching
+            matched_fk = set()
+            for qt in q_tokens:
+                for ft in fk_tokens:
+                    if ft not in matched_fk:
+                        # Exact match or high-similarity fuzzy match
+                        if qt == ft or _string_similarity(qt, ft) >= 0.80:
+                            overlap_count += 1
+                            matched_fk.add(ft)
+                            break
+            
+            score = overlap_count / min(len(fk_tokens), len(q_tokens)) if min(len(fk_tokens), len(q_tokens)) > 0 else 0
             if score > best_score:
                 best_score = score
                 best_val = val
@@ -928,14 +970,16 @@ class ReasoningEngine:
                 steps.append({"desc": f"Quadratic: x² = {x_sq}", "val": result})
                 return result, steps
 
-        # f(x) evaluation  (v2 – more robust regex + safe polynomial eval)
-        m = re.search(r"f\(x\)\s*=\s*(.+?)(?:,|\s*\.?\s*)[Ww]hat\s+is\s+f\((\d+)\)", question)
+        # f(x) evaluation (Generalised to any single letter function name)
+        # Matches: "If g(x) = ..., what is g(5)"
+        m = re.search(r"([a-z])\(x\)\s*=\s*(.+?)(?:,|\s*\.?\s*)[Ww]hat\s+is\s+\1\((\d+)\)", question)
         if m:
-            expr_str = m.group(1).strip().rstrip(",. ")
-            x_val = int(m.group(2))
+            func_name = m.group(1)
+            expr_str = m.group(2).strip().rstrip(",. ")
+            x_val = int(m.group(3))
             result = self._eval_polynomial(expr_str, x_val)
             if result is not None:
-                steps.append({"desc": f"Evaluate f({x_val}) = {result}", "val": result})
+                steps.append({"desc": f"Evaluate {func_name}({x_val}) = {result}", "val": result})
                 return result, steps
 
         # System of equations: x + y = A and x - y = B
@@ -1033,6 +1077,9 @@ class ReasoningEngine:
             
             # Handle implicit multiplication: 3x → 3*x
             e = re.sub(r"(\d)x", r"\1*x", e)
+            
+            # Handle implicit multiplication: x(...) → x*(...)
+            e = re.sub(r"([a-z])\(", r"\1*(", e)
 
             # Replace standalone x (not already part of x_val)
             e = re.sub(r"(?<!\d)x(?!\d)", f"({x_val})", e)
