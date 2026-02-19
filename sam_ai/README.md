@@ -291,6 +291,130 @@ If you use SAM-AI in your research, please cite:
 | Date       | Accuracy | ECE   | Milestones Achieved |
 |------------|----------|-------|---------------------|
 | 2026-02-14 | **100.0%** | 0.05  | Full reasoning pipeline refinement; resolved ambiguity in analogy tasks and implicit multiplication in polynomial evaluation. |
+| 2026-02-18 | —        | —     | Research-grade upgrade: interactive demo, NLP parser, adversarial dataset, adaptive learning, 4-mode baseline comparison, extended visualizations. |
+
+---
+
+## 12. Research-Grade Upgrade (v3)
+
+This section documents the seven-stage upgrade that transforms SAM-AI into a fully demonstrable, research-grade cognitive reasoning system.
+
+### Stage 1 — Interactive Demo Interface (`sam_ai/demo_app.py`)
+
+A Streamlit web application providing a live demonstration of the full SAM-AI pipeline.
+
+**Features:**
+- Natural language input via the NLP Parser
+- Four output panels: Reasoning Trace · Meta-Evaluation · Uncertainty Metrics · Self-Correction
+- Sidebar controls: enable/disable correction, load example problems, toggle raw JSON output
+- Dark glassmorphism UI with score bars and confidence sparklines
+
+**Run:**
+```bash
+streamlit run sam_ai/demo_app.py
+```
+
+---
+
+### Stage 2 — Baseline Experiment Comparison (`sam_ai/experiments/evaluation_runner.py`)
+
+The `EvaluationRunner` now supports four ablation modes for systematic component analysis:
+
+| Mode | Components Active | Purpose |
+|------|-------------------|---------|
+| 1 | Reasoning Engine only | Baseline without evaluation |
+| 2 | + Meta-Evaluation | Adds quality scoring |
+| 3 | + Uncertainty Model | Adds calibrated confidence |
+| 4 | Full Pipeline (+ Self-Correction) | Complete SAM-AI system |
+
+**Run all modes with comparison table:**
+```python
+from sam_ai.experiments.evaluation_runner import BaselineComparisonRunner
+runner = BaselineComparisonRunner(output_dir="output", domains=["logic", "math"])
+results = runner.run_all_modes()
+```
+
+**CLI:**
+```bash
+python sam_ai/main.py --mode compare --domains logic math pattern
+```
+
+---
+
+### Stage 3 — Performance Visualization (`sam_ai/utils/visualization.py`)
+
+Three new publication-quality charts (dark theme, saved to `output/`):
+
+| Chart | File | Description |
+|-------|------|-------------|
+| Accuracy vs Iteration | `accuracy_vs_iteration.png` | Accuracy trend with linear regression overlay |
+| Error Reduction | `error_reduction.png` | Before/after correction error rates by category |
+| Module Contribution | `module_contribution.png` | Accuracy/ECE/CCPS across all 4 evaluation modes |
+
+---
+
+### Stage 4 — NLP Preprocessing Module (`sam_ai/nlp_parser.py`)
+
+Rule-based natural language → structured task converter. No external APIs or ML models required.
+
+**Supported categories:** propositional · syllogistic · conditional · contrapositive · arithmetic · algebra · number_theory · word_problem · sequence · matrix · analogy
+
+**Usage:**
+```python
+from sam_ai.nlp_parser import NLPParser
+parser = NLPParser()
+task = parser.parse("If it rains, the ground is wet. It is raining. Is the ground wet?")
+# → {"category": "propositional", "premises": [...], "question": "...", ...}
+```
+
+---
+
+### Stage 5 — Adaptive Learning Mechanism (`sam_ai/self_corrector.py`)
+
+The `SelfCorrector` (v3) now learns from past correction patterns across sessions.
+
+**How it works:**
+1. After each task, records outcome to `output/learning_history.json`
+2. Tracks per-category failure rates and per-strategy acceptance rates
+3. Adjusts confidence thresholds: `effective_threshold = quality_threshold × confidence_weight`
+4. Prefers historically successful strategies for each category
+
+**Access learning statistics:**
+```python
+from sam_ai.self_corrector import SelfCorrector
+sc = SelfCorrector()
+print(sc.get_learning_statistics())
+```
+
+---
+
+### Stage 6 — Adversarial Dataset (`sam_ai/datasets/adversarial_tasks.py`)
+
+19 curated adversarial tasks across three categories:
+
+| Type | Count | Examples |
+|------|-------|---------|
+| `fallacy_trap` | 7 | Affirming the consequent, circular reasoning, hasty generalisation |
+| `contradictory` | 5 | Direct contradiction, implicit contradiction chains |
+| `ambiguous` | 7 | Scope ambiguity, referential ambiguity, Liar's paradox |
+
+**Usage:**
+```python
+from sam_ai.datasets.adversarial_tasks import get_adversarial_tasks, get_adversarial_tasks_by_type
+all_tasks = get_adversarial_tasks()                          # all 19
+fallacies = get_adversarial_tasks_by_type("fallacy_trap")   # 7 tasks
+```
+
+Include in evaluation:
+```python
+runner = EvaluationRunner(domains=["logic", "math", "pattern", "adversarial"])
+```
+
+---
+
+### Stage 7 — Updated Documentation
+
+This README has been updated to document all new modules, APIs, and usage patterns introduced in the v3 research-grade upgrade.
 
 ---
 

@@ -1,0 +1,414 @@
+{
+  "nlp_parser": {
+    "accuracy": 1.0,
+    "results": [
+      {
+        "input": "If it rains, the ground is wet. It is raining. Is the ground wet?",
+        "detected": "propositional",
+        "expected": "propositional",
+        "match": true
+      },
+      {
+        "input": "All mammals are animals. All dogs are mammals. Are all dogs animals?",
+        "detected": "syllogistic",
+        "expected": "syllogistic",
+        "match": true
+      },
+      {
+        "input": "What is 15 + 27?",
+        "detected": "arithmetic",
+        "expected": "arithmetic",
+        "match": true
+      },
+      {
+        "input": "Solve for x: x + 5 = 12",
+        "detected": "algebra",
+        "expected": "algebra",
+        "match": true
+      },
+      {
+        "input": "What is the next number in the sequence: 2, 4, 8, 16, __?",
+        "detected": "sequence",
+        "expected": "sequence",
+        "match": true
+      },
+      {
+        "input": "Is 17 a prime number?",
+        "detected": "number_theory",
+        "expected": "number_theory",
+        "match": true
+      }
+    ]
+  },
+  "adversarial_dataset": {
+    "total_tasks": 19,
+    "summary": {
+      "fallacy_trap": 7,
+      "contradictory": 5,
+      "ambiguous": 7
+    }
+  },
+  "single_task": {
+    "answer": "True",
+    "correct": true,
+    "quality": 0.8996,
+    "confidence": 0.8521185950380875,
+    "reliability": "HIGH"
+  },
+  "full_pipeline": {
+    "round_id": 1,
+    "accuracy": 1.0,
+    "ece": 0.1601,
+    "ccps": 0.7524,
+    "avg_chain_consistency": 0.9494,
+    "n_tasks": 45,
+    "per_category": {
+      "propositional": {
+        "accuracy": 1.0,
+        "n": 6
+      },
+      "syllogistic": {
+        "accuracy": 1.0,
+        "n": 5
+      },
+      "contrapositive": {
+        "accuracy": 1.0,
+        "n": 1
+      },
+      "conditional": {
+        "accuracy": 1.0,
+        "n": 3
+      },
+      "arithmetic": {
+        "accuracy": 1.0,
+        "n": 3
+      },
+      "algebra": {
+        "accuracy": 1.0,
+        "n": 4
+      },
+      "number_theory": {
+        "accuracy": 1.0,
+        "n": 4
+      },
+      "word_problem": {
+        "accuracy": 1.0,
+        "n": 4
+      },
+      "sequence": {
+        "accuracy": 1.0,
+        "n": 8
+      },
+      "matrix": {
+        "accuracy": 1.0,
+        "n": 3
+      },
+      "analogy": {
+        "accuracy": 1.0,
+        "n": 4
+      }
+    },
+    "correction_rate": 0.0,
+    "avg_confidence": 0.8399,
+    "avg_meta_quality": 0.898,
+    "elapsed_seconds": 0.1,
+    "weaknesses": [
+      "Poor calibration: ECE=0.160 (should be < 0.15)"
+    ],
+    "mode": 4,
+    "mode_name": "Mode 4: Full SAM-AI Pipeline"
+  },
+  "adversarial_eval": {
+    "round_id": 2,
+    "accuracy": 0.7895,
+    "ece": 0.2544,
+    "ccps": 0.6431,
+    "avg_chain_consistency": 0.9394,
+    "n_tasks": 19,
+    "per_category": {
+      "propositional": {
+        "accuracy": 0.5,
+        "n": 8
+      },
+      "syllogistic": {
+        "accuracy": 1.0,
+        "n": 6
+      },
+      "conditional": {
+        "accuracy": 1.0,
+        "n": 3
+      },
+      "arithmetic": {
+        "accuracy": 1.0,
+        "n": 1
+      },
+      "sequence": {
+        "accuracy": 1.0,
+        "n": 1
+      }
+    },
+    "correction_rate": 0.0,
+    "avg_confidence": 0.79,
+    "avg_meta_quality": 0.8164,
+    "elapsed_seconds": 0.07,
+    "weaknesses": [
+      "Poor calibration: ECE=0.254 (should be < 0.15)"
+    ],
+    "mode": 4,
+    "mode_name": "Mode 4: Full SAM-AI Pipeline"
+  },
+  "mode_comparison": {
+    "1": {
+      "round_id": 1,
+      "accuracy": 1.0,
+      "ece": 0.1502,
+      "ccps": 0.7624,
+      "avg_chain_consistency": 1.0,
+      "n_tasks": 45,
+      "per_category": {
+        "propositional": {
+          "accuracy": 1.0,
+          "n": 6
+        },
+        "syllogistic": {
+          "accuracy": 1.0,
+          "n": 5
+        },
+        "contrapositive": {
+          "accuracy": 1.0,
+          "n": 1
+        },
+        "conditional": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "arithmetic": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "algebra": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "number_theory": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "word_problem": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "sequence": {
+          "accuracy": 1.0,
+          "n": 8
+        },
+        "matrix": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "analogy": {
+          "accuracy": 1.0,
+          "n": 4
+        }
+      },
+      "correction_rate": 0.0,
+      "avg_confidence": 0.8498,
+      "avg_meta_quality": 0.8498,
+      "elapsed_seconds": 0.02,
+      "weaknesses": [
+        "Poor calibration: ECE=0.150 (should be < 0.15)"
+      ],
+      "mode": 1,
+      "mode_name": "Mode 1: Reasoning Engine Only"
+    },
+    "2": {
+      "round_id": 2,
+      "accuracy": 1.0,
+      "ece": 0.1502,
+      "ccps": 0.7549,
+      "avg_chain_consistency": 0.9494,
+      "n_tasks": 45,
+      "per_category": {
+        "propositional": {
+          "accuracy": 1.0,
+          "n": 6
+        },
+        "syllogistic": {
+          "accuracy": 1.0,
+          "n": 5
+        },
+        "contrapositive": {
+          "accuracy": 1.0,
+          "n": 1
+        },
+        "conditional": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "arithmetic": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "algebra": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "number_theory": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "word_problem": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "sequence": {
+          "accuracy": 1.0,
+          "n": 8
+        },
+        "matrix": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "analogy": {
+          "accuracy": 1.0,
+          "n": 4
+        }
+      },
+      "correction_rate": 0.0,
+      "avg_confidence": 0.8498,
+      "avg_meta_quality": 0.898,
+      "elapsed_seconds": 0.04,
+      "weaknesses": [
+        "Poor calibration: ECE=0.150 (should be < 0.15)"
+      ],
+      "mode": 2,
+      "mode_name": "Mode 2: Reasoning + Meta Evaluation"
+    },
+    "3": {
+      "round_id": 3,
+      "accuracy": 1.0,
+      "ece": 0.1601,
+      "ccps": 0.7524,
+      "avg_chain_consistency": 0.9494,
+      "n_tasks": 45,
+      "per_category": {
+        "propositional": {
+          "accuracy": 1.0,
+          "n": 6
+        },
+        "syllogistic": {
+          "accuracy": 1.0,
+          "n": 5
+        },
+        "contrapositive": {
+          "accuracy": 1.0,
+          "n": 1
+        },
+        "conditional": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "arithmetic": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "algebra": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "number_theory": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "word_problem": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "sequence": {
+          "accuracy": 1.0,
+          "n": 8
+        },
+        "matrix": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "analogy": {
+          "accuracy": 1.0,
+          "n": 4
+        }
+      },
+      "correction_rate": 0.0,
+      "avg_confidence": 0.8399,
+      "avg_meta_quality": 0.898,
+      "elapsed_seconds": 0.04,
+      "weaknesses": [
+        "Poor calibration: ECE=0.160 (should be < 0.15)"
+      ],
+      "mode": 3,
+      "mode_name": "Mode 3: Reasoning + Meta Eval + Uncertainty"
+    },
+    "4": {
+      "round_id": 4,
+      "accuracy": 1.0,
+      "ece": 0.1601,
+      "ccps": 0.7524,
+      "avg_chain_consistency": 0.9494,
+      "n_tasks": 45,
+      "per_category": {
+        "propositional": {
+          "accuracy": 1.0,
+          "n": 6
+        },
+        "syllogistic": {
+          "accuracy": 1.0,
+          "n": 5
+        },
+        "contrapositive": {
+          "accuracy": 1.0,
+          "n": 1
+        },
+        "conditional": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "arithmetic": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "algebra": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "number_theory": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "word_problem": {
+          "accuracy": 1.0,
+          "n": 4
+        },
+        "sequence": {
+          "accuracy": 1.0,
+          "n": 8
+        },
+        "matrix": {
+          "accuracy": 1.0,
+          "n": 3
+        },
+        "analogy": {
+          "accuracy": 1.0,
+          "n": 4
+        }
+      },
+      "correction_rate": 0.0,
+      "avg_confidence": 0.8399,
+      "avg_meta_quality": 0.898,
+      "elapsed_seconds": 0.08,
+      "weaknesses": [
+        "Poor calibration: ECE=0.160 (should be < 0.15)"
+      ],
+      "mode": 4,
+      "mode_name": "Mode 4: Full SAM-AI Pipeline"
+    }
+  }
+}

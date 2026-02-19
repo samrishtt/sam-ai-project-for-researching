@@ -31,6 +31,7 @@ class PerformanceRecord:
         self.per_category: Dict[str, Dict[str, float]] = {}
         self.correction_rate: float = 0.0
         self.avg_confidence: float = 0.0
+        self.avg_meta_quality: float = 0.0
 
     def to_dict(self):
         return {
@@ -43,6 +44,7 @@ class PerformanceRecord:
             "per_category": self.per_category,
             "correction_rate": round(self.correction_rate, 4),
             "avg_confidence": round(self.avg_confidence, 4),
+            "avg_meta_quality": round(self.avg_meta_quality, 4),
         }
 
 
@@ -94,6 +96,9 @@ class PerformanceAnalyzer:
 
         corrected = sum(1 for r in task_results if r.get("was_corrected"))
         rec.correction_rate = corrected / max(rec.n_tasks, 1)
+
+        meta_qualities = [r.get("meta_quality", 0.0) for r in task_results]
+        rec.avg_meta_quality = sum(meta_qualities) / max(len(meta_qualities), 1)
 
         rec.ccps = cognitive_performance_score(
             rec.accuracy, rec.ece,
